@@ -2,7 +2,7 @@ import os
 import logging
 from time import sleep
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, ContextTypes
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ContextTypes
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -12,9 +12,8 @@ logger = logging.getLogger()
 BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')  # API Token from Railway env variables or local setup
 ADMIN_ID = os.getenv('ADMIN_ID')  # Admin ID from Railway env variables or local setup
 
-# Initialize bot and updater
-updater = Updater(token=BOT_API_TOKEN, use_context=True)
-dispatcher = updater.dispatcher
+# Initialize bot and application
+application = Application.builder().token(BOT_API_TOKEN).build()
 
 # Function to send message with videos and delete them after 30 seconds
 async def send_videos_and_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -85,10 +84,9 @@ def new_member(update, context):
         start(update, context)  # Call start method to send the initial message.
 
 # Handlers
-dispatcher.add_handler(MessageHandler(Filters.status_update.new_chat_members, new_member))
-dispatcher.add_handler(CallbackQueryHandler(handle_no_share, pattern="no_share"))
-dispatcher.add_handler(CommandHandler("start", start))
+application.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, new_member))
+application.add_handler(CallbackQueryHandler(handle_no_share, pattern="no_share"))
+application.add_handler(CommandHandler("start", start))
 
 # Start the bot
-updater.start_polling()
-updater.idle()
+application.run_polling()
