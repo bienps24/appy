@@ -17,11 +17,6 @@ VIDEO1_URL = os.getenv('VIDEO1_URL')
 VIDEO2_URL = os.getenv('VIDEO2_URL')
 VIDEO3_URL = os.getenv('VIDEO3_URL')
 
-# Log the URLs for debugging
-logger.info(f"VIDEO1_URL: {VIDEO1_URL}")
-logger.info(f"VIDEO2_URL: {VIDEO2_URL}")
-logger.info(f"VIDEO3_URL: {VIDEO3_URL}")
-
 # Initialize bot and application
 application = Application.builder().token(BOT_API_TOKEN).build()
 
@@ -63,7 +58,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Send a personal message with buttons
     buttons = [
         [
-            InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/+J7QmfrqcY-U5MTBl"),
+            InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl"),
             InlineKeyboardButton("Don't Want to Share", callback_data="no_share")
         ]
     ]
@@ -95,13 +90,14 @@ async def handle_no_share(update, context):
 async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Send a welcome message when a new member joins."""
     for new_user in update.message.new_chat_members:
+        logger.info(f"New user joined: {new_user.first_name}")
         await context.bot.send_message(
             chat_id=update.message.chat_id,
             text=f"Welcome {new_user.first_name}! I’m your bot. Please check your messages for instructions.")
         await start(update, context)  # Call start method to send the initial message.
 
 # Handlers
-application.add_handler(ChatMemberHandler(new_member))  # Correct way to add a ChatMemberHandler
+application.add_handler(ChatMemberHandler(new_member, pattern="*"))  # Correct way to add a ChatMemberHandler
 application.add_handler(CallbackQueryHandler(handle_no_share, pattern="no_share"))
 application.add_handler(CommandHandler("start", start))
 
