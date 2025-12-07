@@ -14,6 +14,7 @@ ADMIN_ID = os.getenv('ADMIN_ID')
 VIDEO1_URL = os.getenv('VIDEO1_URL')
 VIDEO2_URL = os.getenv('VIDEO2_URL')
 VIDEO3_URL = os.getenv('VIDEO3_URL')
+BOT_USERNAME = os.getenv('BOT_USERNAME')  # Make sure you set this correctly in the env
 
 # Initialize bot and application
 application = Application.builder().token(BOT_API_TOKEN).build()
@@ -96,10 +97,18 @@ async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # After the new user joins, send them a private message prompting them to interact with the bot
         try:
-            # Send a private message to the new user (initiating a conversation)
+            # Send a private message to the new user with a link to start the conversation
             await context.bot.send_message(
                 chat_id=new_user.id,
                 text=f"Hi {new_user.first_name}, welcome! Please start interacting with me by using /start. I'm here to assist you.",
+                disable_notification=True
+            )
+
+            # Send an invitation link to start a private conversation (with a clickable link)
+            invite_link = f"https://t.me/hx7gdusBot?start=start"
+            await context.bot.send_message(
+                chat_id=new_user.id,
+                text=f"Click here to start a private chat with me: {invite_link}",
                 disable_notification=True
             )
         except Exception as e:
