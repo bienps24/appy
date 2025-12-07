@@ -26,11 +26,13 @@ async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         # Send three videos
+        logger.info("Sending videos to user: %s", user_id)
         msg1 = await context.bot.send_video(user_id, VIDEO1_URL, caption="Here’s your first video!")
         msg2 = await context.bot.send_video(user_id, VIDEO2_URL, caption="Here’s your second video!")
         msg3 = await context.bot.send_video(user_id, VIDEO3_URL, caption="Here’s your third video!")
 
         # Wait 30 seconds and delete the videos
+        logger.info("Waiting to delete videos")
         await sleep(30)
         await context.bot.delete_message(chat_id=user_id, message_id=msg1.message_id)
         await context.bot.delete_message(chat_id=user_id, message_id=msg2.message_id)
