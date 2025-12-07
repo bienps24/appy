@@ -1,0 +1,90 @@
+import os
+import logging
+from time import sleep
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, ContextTypes
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
+
+# Fetch environment variables (These will be set on Railway)
+BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')  # API Token from Railway env variables
+ADMIN_ID = os.getenv('ADMIN_ID')  # Admin ID from Railway env variables
+
+# Initialize bot and updater
+updater = Updater(token=BOT_API_TOKEN, use_context=True)
+dispatcher = updater.dispatcher
+
+# Function to send message with videos and delete them after 30 seconds
+async def send_videos_and_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.message.from_user.id
+
+    # Send two videos (Replace with actual video links)
+    video1 = "https://example.com/video1.mp4"  # Replace with actual video link
+    video2 = "https://example.com/video2.mp4"  # Replace with actual video link
+
+    msg1 = await context.bot.send_video(user_id, video1, caption="Here’s your first video!")
+    msg2 = await context.bot.send_video(user_id, video2, caption="Here’s your second video!")
+
+    # Wait 30 seconds and delete the videos
+    await sleep(30)
+    await context.bot.delete_message(chat_id=user_id, message_id=msg1.message_id)
+    await context.bot.delete_message(chat_id=user_id, message_id=msg2.message_id)
+
+    # Send reminder after 1 minute
+    await sleep(30)  # Wait for another 30 seconds to make it 1 minute from the start
+    await context.bot.send_message(
+        chat_id=user_id,
+        text="Reminder: Don't forget to share for free access or make a payment for global access. Click below to choose your option.",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl")],
+            [InlineKeyboardButton("Payment Option", url="https://t.me/Cryptopayphbot?startapp=pay")]
+        ])
+    )
+
+# Function to handle new users and send initial message
+def start(update, context):
+    """Send welcome message and provide options."""
+    user = update.message.from_user
+    user_id = user.id
+
+    # Send a personal message with buttons
+    buttons = [
+        [
+            InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl"),
+            InlineKeyboardButton("Don't Want to Share", callback_data="no_share")
+        ],
+        [
+            InlineKeyboardButton("Payment Option", url="https://t.me/Cryptopayphbot?startapp=pay")
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(buttons)
+    context.bot.send_message(chat_id=user_id, text="Welcome! Choose an option to join:", reply_markup=reply_markup)
+
+    # Call function to send videos and delete them
+    context.job_queue.run_once(send_videos_and_delete, 1, context=update)
+
+# Handle "Don't Want to Share" option
+def handle_no_share(update, context):
+    """Handle the case where the user does not want to share."""
+    user = update.callback_query.from_user
+    context.bot.send_message(chat_id=user.id, text="Payment required for full access. Here’s your payment link:\n https://t.me/Cryptopayphbot?startapp=pay")
+
+# Handle new member joining the group or channel
+def new_member(update, context):
+    """Send a welcome message when a new member joins."""
+    for new_user in update.message.new_chat_members:
+        context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text=f"Welcome {new_user.first_name}! I’m your bot. Please check your messages for instructions.")
+        start(update, context)  # Call start method to send the initial message.
+
+# Handlers
+dispatcher.add_handler(MessageHandler(Filters.status_update.new_chat_members, new_member))
+dispatcher.add_handler(CallbackQueryHandler(handle_no_share, pattern="no_share"))
+dispatcher.add_handler(CommandHandler("start", start))
+
+# Start the bot
+updater.start_polling()
+updater.idle()
