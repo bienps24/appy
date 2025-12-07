@@ -1,18 +1,16 @@
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, ChatMemberHandler
 import os
 import logging
 from time import sleep
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, ChatMemberHandler
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
 # Fetch environment variables (These will be set on Railway or your local environment)
-BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')  # API Token from Railway env variables or local setup
-ADMIN_ID = os.getenv('ADMIN_ID')  # Admin ID from Railway env variables or local setup
-
-# Fetch video links from environment variables
+BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')
+ADMIN_ID = os.getenv('ADMIN_ID')
 VIDEO1_URL = os.getenv('VIDEO1_URL')
 VIDEO2_URL = os.getenv('VIDEO2_URL')
 VIDEO3_URL = os.getenv('VIDEO3_URL')
@@ -21,16 +19,16 @@ VIDEO3_URL = os.getenv('VIDEO3_URL')
 application = Application.builder().token(BOT_API_TOKEN).build()
 
 # Function to send message with videos and delete them after 30 seconds
-async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id
-
+async def send_videos(user_id, context):
     try:
         # Send three videos
+        logger.info("Sending videos to user: %s", user_id)
         msg1 = await context.bot.send_video(user_id, VIDEO1_URL, caption="Here’s your first video!")
         msg2 = await context.bot.send_video(user_id, VIDEO2_URL, caption="Here’s your second video!")
         msg3 = await context.bot.send_video(user_id, VIDEO3_URL, caption="Here’s your third video!")
 
         # Wait 30 seconds and delete the videos
+        logger.info("Waiting to delete videos")
         await sleep(30)
         await context.bot.delete_message(chat_id=user_id, message_id=msg1.message_id)
         await context.bot.delete_message(chat_id=user_id, message_id=msg2.message_id)
@@ -42,7 +40,7 @@ async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=user_id,
             text="Reminder: Don't forget to share for free access or make a payment for global access. Click below to choose your option.",
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl")]
+                [InlineKeyboardButton("Share 0/2 for Free Access", url="https://t.me/share/url?url=%20Hello%20guys%20Join%20kayo%20FREE%20WATCH%20at%20ACCESS%20https://t.me/joinchat/J7QmfrqcY-U5MTBl")]
             ])
         )
     except Exception as e:
@@ -58,7 +56,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Send a personal message with buttons
     buttons = [
         [
-            InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl"),
+            InlineKeyboardButton("Share 0/2 for Free Access", url="https://t.me/share/url?url=%20tara%20guys%20sali%20kayo%20𝙡𝙞𝙗𝙧𝙚%20𝙗𝙤𝙨𝙤%20at%20ᴀᴛᴀʙꜱ!%20https://t.me/joinchat/J7QmfrqcY-U5MTBl"),
             InlineKeyboardButton("Don't Want to Share", callback_data="no_share")
         ]
     ]
@@ -66,7 +64,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=user_id, text="Welcome! Choose an option to join:", reply_markup=reply_markup)
 
     # Call function to send videos and delete them
-    context.job_queue.run_once(send_videos, 1, context=update)
+    await send_videos(user_id, context)
 
 # Handle "Don't Want to Share" option
 async def handle_no_share(update, context):
@@ -86,27 +84,18 @@ async def handle_no_share(update, context):
     # Send the payment instructions with the button
     await context.bot.send_message(chat_id=user.id, text=payment_instructions, parse_mode='Markdown', reply_markup=payment_button)
 
-# Handle new member joining the group or channel (private channel)
+# Handle new member joining the group or channel
 async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send a welcome message when a new member joins the group/channel."""
+    """Send a welcome message when a new member joins."""
     for new_user in update.message.new_chat_members:
         logger.info(f"New user joined: {new_user.first_name}")
-        
-        # Send a message to the user who joined the channel
-        try:
-            # Check if it's a private channel and the bot is an admin
-            user_id = new_user.id
-            await context.bot.send_message(
-                chat_id=user_id,
-                text="Welcome to the private channel! You will receive some instructions shortly."
-            )
-            # Optionally, call the start function to send more information
-            await start(update, context)  # Sends welcome message with buttons
-        except Exception as e:
-            logger.error(f"Error sending message to new user: {e}")
+        await context.bot.send_message(
+            chat_id=update.message.chat_id,
+            text=f"Welcome {new_user.first_name}! I’m your bot. Please check your messages for instructions.")
+        await start(update, context)  # Call start method to send the initial message.
 
 # Handlers
-application.add_handler(ChatMemberHandler(new_member))  # Correct way to add a ChatMemberHandler
+application.add_handler(ChatMemberHandler(new_member))  # Removed 'pattern' as it's not needed here
 application.add_handler(CallbackQueryHandler(handle_no_share, pattern="no_share"))
 application.add_handler(CommandHandler("start", start))
 
