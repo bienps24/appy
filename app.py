@@ -1,18 +1,16 @@
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, ChatMemberHandler
 import os
 import logging
 from time import sleep
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, ChatMemberHandler
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
 # Fetch environment variables (These will be set on Railway or your local environment)
-BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')  # API Token from Railway env variables or local setup
-ADMIN_ID = os.getenv('ADMIN_ID')  # Admin ID from Railway env variables or local setup
-
-# Fetch video links from environment variables
+BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')
+ADMIN_ID = os.getenv('ADMIN_ID')
 VIDEO1_URL = os.getenv('VIDEO1_URL')
 VIDEO2_URL = os.getenv('VIDEO2_URL')
 VIDEO3_URL = os.getenv('VIDEO3_URL')
@@ -21,9 +19,7 @@ VIDEO3_URL = os.getenv('VIDEO3_URL')
 application = Application.builder().token(BOT_API_TOKEN).build()
 
 # Function to send message with videos and delete them after 30 seconds
-async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id
-
+async def send_videos(user_id, context):
     try:
         # Send three videos
         logger.info("Sending videos to user: %s", user_id)
@@ -68,7 +64,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=user_id, text="Welcome! Choose an option to join:", reply_markup=reply_markup)
 
     # Call function to send videos and delete them
-    context.job_queue.run_once(send_videos, 1, context=update)
+    await send_videos(user_id, context)
 
 # Handle "Don't Want to Share" option
 async def handle_no_share(update, context):
