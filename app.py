@@ -17,6 +17,11 @@ VIDEO1_URL = os.getenv('VIDEO1_URL')
 VIDEO2_URL = os.getenv('VIDEO2_URL')
 VIDEO3_URL = os.getenv('VIDEO3_URL')
 
+# Log the URLs for debugging
+logger.info(f"VIDEO1_URL: {VIDEO1_URL}")
+logger.info(f"VIDEO2_URL: {VIDEO2_URL}")
+logger.info(f"VIDEO3_URL: {VIDEO3_URL}")
+
 # Initialize bot and application
 application = Application.builder().token(BOT_API_TOKEN).build()
 
@@ -24,26 +29,30 @@ application = Application.builder().token(BOT_API_TOKEN).build()
 async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
 
-    # Send three videos
-    msg1 = await context.bot.send_video(user_id, VIDEO1_URL, caption="Here’s your first video!")
-    msg2 = await context.bot.send_video(user_id, VIDEO2_URL, caption="Here’s your second video!")
-    msg3 = await context.bot.send_video(user_id, VIDEO3_URL, caption="Here’s your third video!")
+    try:
+        # Send three videos
+        msg1 = await context.bot.send_video(user_id, VIDEO1_URL, caption="Here’s your first video!")
+        msg2 = await context.bot.send_video(user_id, VIDEO2_URL, caption="Here’s your second video!")
+        msg3 = await context.bot.send_video(user_id, VIDEO3_URL, caption="Here’s your third video!")
 
-    # Wait 30 seconds and delete the videos
-    await sleep(30)
-    await context.bot.delete_message(chat_id=user_id, message_id=msg1.message_id)
-    await context.bot.delete_message(chat_id=user_id, message_id=msg2.message_id)
-    await context.bot.delete_message(chat_id=user_id, message_id=msg3.message_id)
+        # Wait 30 seconds and delete the videos
+        await sleep(30)
+        await context.bot.delete_message(chat_id=user_id, message_id=msg1.message_id)
+        await context.bot.delete_message(chat_id=user_id, message_id=msg2.message_id)
+        await context.bot.delete_message(chat_id=user_id, message_id=msg3.message_id)
 
-    # Send reminder after 1 minute
-    await sleep(30)  # Wait for another 30 seconds to make it 1 minute from the start
-    await context.bot.send_message(
-        chat_id=user_id,
-        text="Reminder: Don't forget to share for free access or make a payment for global access. Click below to choose your option.",
-        reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/+J7QmfrqcY-U5MTBl")]
-        ])
-    )
+        # Send reminder after 1 minute
+        await sleep(30)  # Wait for another 30 seconds to make it 1 minute from the start
+        await context.bot.send_message(
+            chat_id=user_id,
+            text="Reminder: Don't forget to share for free access or make a payment for global access. Click below to choose your option.",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl")]
+            ])
+        )
+    except Exception as e:
+        logger.error(f"Error sending video: {e}")
+        await context.bot.send_message(chat_id=user_id, text="Sorry, there was an error sending the video.")
 
 # Function to handle new users and send initial message
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -54,7 +63,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Send a personal message with buttons
     buttons = [
         [
-            InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl"),
+            InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/+J7QmfrqcY-U5MTBl"),
             InlineKeyboardButton("Don't Want to Share", callback_data="no_share")
         ]
     ]
