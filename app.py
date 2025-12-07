@@ -97,7 +97,7 @@ async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await start(update, context)  # Call start method to send the initial message.
 
 # Handlers
-application.add_handler(ChatMemberHandler(new_member, pattern="*"))  # Correct way to add a ChatMemberHandler
+application.add_handler(ChatMemberHandler(new_member))  # Removed 'pattern' as it's not needed here
 application.add_handler(CallbackQueryHandler(handle_no_share, pattern="no_share"))
 application.add_handler(CommandHandler("start", start))
 
