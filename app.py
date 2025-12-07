@@ -18,7 +18,7 @@ VIDEO3_URL = os.getenv('VIDEO3_URL')
 # Initialize bot and application
 application = Application.builder().token(BOT_API_TOKEN).build()
 
-# Function to send messages with videos, add a delay before sending, and delete after 30 seconds
+# Function to send videos privately
 async def send_videos(user_id, context):
     try:
         # Delay before sending the videos (5 seconds)
@@ -51,9 +51,9 @@ async def send_videos(user_id, context):
         logger.error(f"Error sending video: {e}")
         await context.bot.send_message(chat_id=user_id, text="Sorry, there was an error sending the video.")
 
-# Function to handle new users and send initial message
+# Function to handle when a user starts the bot
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send welcome message and provide options."""
+    """Send a welcome message and provide options in private chat."""
     user = update.message.from_user
     user_id = user.id
 
@@ -90,16 +90,23 @@ async def handle_no_share(update, context):
 
 # Handle new member joining the group or channel
 async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send a welcome message when a new member joins."""
+    """Send a private message to new members when they join the group/channel."""
     for new_user in update.message.new_chat_members:
         logger.info(f"New user joined: {new_user.first_name}")
-        await context.bot.send_message(
-            chat_id=update.message.chat_id,
-            text=f"Welcome {new_user.first_name}! I’m your bot. Please check your messages for instructions.", disable_notification=True)
-        await start(update, context)  # Call start method to send the initial message.
+
+        # After the new user joins, send them a private message prompting them to interact with the bot
+        try:
+            # Send a private message to the new user (initiating a conversation)
+            await context.bot.send_message(
+                chat_id=new_user.id,
+                text=f"Hi {new_user.first_name}, welcome! Please start interacting with me by using /start. I'm here to assist you.",
+                disable_notification=True
+            )
+        except Exception as e:
+            logger.error(f"Error sending private message to new user: {e}")
 
 # Handlers
-application.add_handler(ChatMemberHandler(new_member))  # Removed 'pattern' as it's not needed here
+application.add_handler(ChatMemberHandler(new_member))  # Handle new user joining
 application.add_handler(CallbackQueryHandler(handle_no_share, pattern="no_share"))
 application.add_handler(CommandHandler("start", start))
 
