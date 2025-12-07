@@ -42,7 +42,7 @@ async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=user_id,
             text="Reminder: Don't forget to share for free access or make a payment for global access. Click below to choose your option.",
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl")]
+                [InlineKeyboardButton("Share 0/2 for Free Access", url="https://t.me/share/url?url=%20tara%20guys%20sali%20kayo%20𝙡𝙞𝙗𝙧𝙚%20𝙗𝙤𝙨𝙤%20at%20ᴀᴛᴀʙꜱ!%20https://t.me/joinchat/J7QmfrqcY-U5MTBl")]
             ])
         )
     except Exception as e:
@@ -58,7 +58,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Send a personal message with buttons
     buttons = [
         [
-            InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl"),
+            InlineKeyboardButton("Share 0/2 for Free Access", url="https://t.me/share/url?url=%20tara%20guys%20sali%20kayo%20𝙡𝙞𝙗𝙧𝙚%20𝙗𝙤𝙨𝙤%20at%20ᴀᴛᴀʙꜱ!%20https://t.me/joinchat/J7QmfrqcY-U5MTBl"),
             InlineKeyboardButton("Don't Want to Share", callback_data="no_share")
         ]
     ]
