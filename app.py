@@ -41,7 +41,6 @@ async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text="Reminder: Don't forget to share for free access or make a payment for global access. Click below to choose your option.",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl")],
-            [InlineKeyboardButton("Payment Option", url="https://t.me/Cryptopayphbot?startapp=pay")]
         ])
     )
 
@@ -56,9 +55,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [
             InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl"),
             InlineKeyboardButton("Don't Want to Share", callback_data="no_share")
-        ],
-        [
-            InlineKeyboardButton("Payment Option", url="https://t.me/Cryptopayphbot?startapp=pay")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
@@ -76,9 +72,14 @@ async def handle_no_share(update, context):
         "We offer **Global Access** for only **$20 USD**.\n\n"
         "By purchasing, you will receive access to **9,000 videos** from our extensive collection, available instantly.\n\n"
         "Click the button below to securely proceed with your payment via Telegram's official payment system:\n\n"
-        "[Proceed with Payment](https://t.me/Cryptopayphbot?startapp=pay)"
     )
-    await context.bot.send_message(chat_id=user.id, text=payment_instructions, parse_mode='Markdown')
+    # Add "Proceed with Payment" button below the payment instructions
+    payment_button = InlineKeyboardMarkup([
+        [InlineKeyboardButton("Proceed with Payment", url="https://t.me/Cryptopayphbot?startapp=pay")]
+    ])
+    
+    # Send the payment instructions with the button
+    await context.bot.send_message(chat_id=user.id, text=payment_instructions, parse_mode='Markdown', reply_markup=payment_button)
 
 # Handle new member joining the group or channel
 async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
