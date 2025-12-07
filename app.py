@@ -15,14 +15,13 @@ ADMIN_ID = os.getenv('ADMIN_ID')  # Admin ID from Railway env variables or local
 # Initialize bot and application
 application = Application.builder().token(BOT_API_TOKEN).build()
 
-# Function to send message with videos and delete them after 30 seconds
-async def send_videos_and_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# Function to send video links
+async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
-
-    # Replace with your actual video links
-    video1 = "https://raw.githubusercontent.com/biensps24/appy/main/1.mp4"  # Replace with actual video link
-    video2 = "https://raw.githubusercontent.com/biensps24/appy/main/2.mp4"  # Replace with actual video link
-    video3 = "https://raw.githubusercontent.com/biensps24/appy/main/3.mp4"  # Replace with actual video link
+    # Replace with actual video links
+    video1 = "https://raw.githubusercontent.com/biensps24/appy/main/1.mp4"
+    video2 = "https://raw.githubusercontent.com/biensps24/appy/main/2.mp4"
+    video3 = "https://raw.githubusercontent.com/biensps24/appy/main/3.mp4"
 
     # Send three videos
     msg1 = await context.bot.send_video(user_id, video1, caption="Here’s your first video!")
@@ -66,7 +65,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=user_id, text="Welcome! Choose an option to join:", reply_markup=reply_markup)
 
     # Call function to send videos and delete them
-    context.job_queue.run_once(send_videos_and_delete, 1, context=update)
+    context.job_queue.run_once(send_videos, 1, context=update)
 
 # Handle "Don't Want to Share" option
 async def handle_no_share(update, context):
