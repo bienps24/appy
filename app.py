@@ -47,7 +47,7 @@ async def send_videos_and_delete(update: Update, context: ContextTypes.DEFAULT_T
     )
 
 # Function to handle new users and send initial message
-def start(update, context):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Send welcome message and provide options."""
     user = update.message.from_user
     user_id = user.id
@@ -63,28 +63,28 @@ def start(update, context):
         ]
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
-    context.bot.send_message(chat_id=user_id, text="Welcome! Choose an option to join:", reply_markup=reply_markup)
+    await context.bot.send_message(chat_id=user_id, text="Welcome! Choose an option to join:", reply_markup=reply_markup)
 
     # Call function to send videos and delete them
     context.job_queue.run_once(send_videos_and_delete, 1, context=update)
 
 # Handle "Don't Want to Share" option
-def handle_no_share(update, context):
+async def handle_no_share(update, context):
     """Handle the case where the user does not want to share."""
     user = update.callback_query.from_user
-    context.bot.send_message(chat_id=user.id, text="Payment required for full access. Here’s your payment link:\n https://t.me/Cryptopayphbot?startapp=pay")
+    await context.bot.send_message(chat_id=user.id, text="Payment required for full access. Here’s your payment link:\n https://t.me/Cryptopayphbot?startapp=pay")
 
 # Handle new member joining the group or channel
-def new_member(update, context):
+async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Send a welcome message when a new member joins."""
     for new_user in update.message.new_chat_members:
-        context.bot.send_message(
+        await context.bot.send_message(
             chat_id=update.message.chat_id,
             text=f"Welcome {new_user.first_name}! I’m your bot. Please check your messages for instructions.")
-        start(update, context)  # Call start method to send the initial message.
+        await start(update, context)  # Call start method to send the initial message.
 
 # Handlers
-application.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, new_member))
+application.add_handler(MessageHandler(filters.ChatMemberUpdate.MY_CHAT_MEMBER, new_member))  # Fixed filter to use new user join
 application.add_handler(CallbackQueryHandler(handle_no_share, pattern="no_share"))
 application.add_handler(CommandHandler("start", start))
 
