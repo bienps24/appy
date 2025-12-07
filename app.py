@@ -18,24 +18,28 @@ VIDEO3_URL = os.getenv('VIDEO3_URL')
 # Initialize bot and application
 application = Application.builder().token(BOT_API_TOKEN).build()
 
-# Function to send message with videos and delete them after 30 seconds
+# Function to send messages with videos, add a delay before sending, and delete after 30 seconds
 async def send_videos(user_id, context):
     try:
+        # Delay before sending the videos (5 seconds)
+        logger.info("Waiting 5 seconds before sending videos")
+        await sleep(5)
+
         # Send three videos
         logger.info("Sending videos to user: %s", user_id)
-        msg1 = await context.bot.send_video(user_id, VIDEO1_URL, caption="Here’s your first video!")
-        msg2 = await context.bot.send_video(user_id, VIDEO2_URL, caption="Here’s your second video!")
-        msg3 = await context.bot.send_video(user_id, VIDEO3_URL, caption="Here’s your third video!")
+        msg1 = await context.bot.send_video(user_id, VIDEO1_URL, caption="Here’s your first video!", disable_notification=True)
+        msg2 = await context.bot.send_video(user_id, VIDEO2_URL, caption="Here’s your second video!", disable_notification=True)
+        msg3 = await context.bot.send_video(user_id, VIDEO3_URL, caption="Here’s your third video!", disable_notification=True)
 
         # Wait 30 seconds and delete the videos
-        logger.info("Waiting to delete videos")
+        logger.info("Waiting 30 seconds to delete videos")
         await sleep(30)
         await context.bot.delete_message(chat_id=user_id, message_id=msg1.message_id)
         await context.bot.delete_message(chat_id=user_id, message_id=msg2.message_id)
         await context.bot.delete_message(chat_id=user_id, message_id=msg3.message_id)
 
         # Send reminder after 1 minute
-        await sleep(30)  # Wait for another 30 seconds to make it 1 minute from the start
+        await sleep(6)  # Wait for another 6 seconds to make it 1 minute from the start
         await context.bot.send_message(
             chat_id=user_id,
             text="Reminder: Don't forget to share for free access or make a payment for global access. Click below to choose your option.",
@@ -61,7 +65,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
-    await context.bot.send_message(chat_id=user_id, text="Welcome! Choose an option to join:", reply_markup=reply_markup)
+    await context.bot.send_message(chat_id=user_id, text="Welcome! Choose an option to join:", reply_markup=reply_markup, disable_notification=True)
 
     # Call function to send videos and delete them
     await send_videos(user_id, context)
@@ -82,7 +86,7 @@ async def handle_no_share(update, context):
     ])
     
     # Send the payment instructions with the button
-    await context.bot.send_message(chat_id=user.id, text=payment_instructions, parse_mode='Markdown', reply_markup=payment_button)
+    await context.bot.send_message(chat_id=user.id, text=payment_instructions, parse_mode='Markdown', reply_markup=payment_button, disable_notification=True)
 
 # Handle new member joining the group or channel
 async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -91,7 +95,7 @@ async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.info(f"New user joined: {new_user.first_name}")
         await context.bot.send_message(
             chat_id=update.message.chat_id,
-            text=f"Welcome {new_user.first_name}! I’m your bot. Please check your messages for instructions.")
+            text=f"Welcome {new_user.first_name}! I’m your bot. Please check your messages for instructions.", disable_notification=True)
         await start(update, context)  # Call start method to send the initial message.
 
 # Handlers
