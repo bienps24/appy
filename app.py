@@ -8,9 +8,9 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
-# Fetch environment variables (These will be set on Railway)
-BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')  # API Token from Railway env variables
-ADMIN_ID = os.getenv('ADMIN_ID')  # Admin ID from Railway env variables
+# Fetch environment variables (These will be set on Railway or your local environment)
+BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')  # API Token from Railway env variables or local setup
+ADMIN_ID = os.getenv('ADMIN_ID')  # Admin ID from Railway env variables or local setup
 
 # Initialize bot and updater
 updater = Updater(token=BOT_API_TOKEN, use_context=True)
@@ -19,18 +19,22 @@ dispatcher = updater.dispatcher
 # Function to send message with videos and delete them after 30 seconds
 async def send_videos_and_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
+saintluke-afk/vids
+    # Replace with your actual video links
+    video1 = "https://raw.githubusercontent.com/saintluke-afk/vids/main/1.mp4"  # Replace with actual video link
+    video2 = "https://raw.githubusercontent.com/saintluke-afk/vids/main/2.mp4"  # Replace with actual video link
+    video3 = "https://raw.githubusercontent.com/saintluke-afk/vids/main/3.mp4"  # Replace with actual video link
 
-    # Send two videos (Replace with actual video links)
-    video1 = "https://example.com/video1.mp4"  # Replace with actual video link
-    video2 = "https://example.com/video2.mp4"  # Replace with actual video link
-
+    # Send three videos
     msg1 = await context.bot.send_video(user_id, video1, caption="Here’s your first video!")
     msg2 = await context.bot.send_video(user_id, video2, caption="Here’s your second video!")
+    msg3 = await context.bot.send_video(user_id, video3, caption="Here’s your third video!")
 
     # Wait 30 seconds and delete the videos
     await sleep(30)
     await context.bot.delete_message(chat_id=user_id, message_id=msg1.message_id)
     await context.bot.delete_message(chat_id=user_id, message_id=msg2.message_id)
+    await context.bot.delete_message(chat_id=user_id, message_id=msg3.message_id)
 
     # Send reminder after 1 minute
     await sleep(30)  # Wait for another 30 seconds to make it 1 minute from the start
