@@ -12,21 +12,22 @@ logger = logging.getLogger()
 BOT_API_TOKEN = os.getenv('BOT_API_TOKEN')  # API Token from Railway env variables or local setup
 ADMIN_ID = os.getenv('ADMIN_ID')  # Admin ID from Railway env variables or local setup
 
+# Fetch video links from environment variables
+VIDEO1_URL = os.getenv('VIDEO1_URL')
+VIDEO2_URL = os.getenv('VIDEO2_URL')
+VIDEO3_URL = os.getenv('VIDEO3_URL')
+
 # Initialize bot and application
 application = Application.builder().token(BOT_API_TOKEN).build()
 
 # Function to send message with videos and delete them after 30 seconds
 async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
-    # Replace with actual video links
-    video1 = "https://raw.githubusercontent.com/biensps24/appy/main/1.mp4"
-    video2 = "https://raw.githubusercontent.com/biensps24/appy/main/2.mp4"
-    video3 = "https://raw.githubusercontent.com/biensps24/appy/main/3.mp4"
 
     # Send three videos
-    msg1 = await context.bot.send_video(user_id, video1, caption="Here’s your first video!")
-    msg2 = await context.bot.send_video(user_id, video2, caption="Here’s your second video!")
-    msg3 = await context.bot.send_video(user_id, video3, caption="Here’s your third video!")
+    msg1 = await context.bot.send_video(user_id, VIDEO1_URL, caption="Here’s your first video!")
+    msg2 = await context.bot.send_video(user_id, VIDEO2_URL, caption="Here’s your second video!")
+    msg3 = await context.bot.send_video(user_id, VIDEO3_URL, caption="Here’s your third video!")
 
     # Wait 30 seconds and delete the videos
     await sleep(30)
@@ -40,7 +41,7 @@ async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=user_id,
         text="Reminder: Don't forget to share for free access or make a payment for global access. Click below to choose your option.",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl")],
+            [InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl")]
         ])
     )
 
