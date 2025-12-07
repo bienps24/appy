@@ -15,7 +15,7 @@ ADMIN_ID = os.getenv('ADMIN_ID')  # Admin ID from Railway env variables or local
 # Initialize bot and application
 application = Application.builder().token(BOT_API_TOKEN).build()
 
-# Function to send video links
+# Function to send message with videos and delete them after 30 seconds
 async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     # Replace with actual video links
@@ -71,7 +71,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_no_share(update, context):
     """Handle the case where the user does not want to share."""
     user = update.callback_query.from_user
-    await context.bot.send_message(chat_id=user.id, text="Payment required for full access. Here’s your payment link:\n https://t.me/Cryptopayphbot?startapp=pay")
+    payment_instructions = (
+        "To gain **Instant Access** to our **premium content**:\n\n"
+        "**Global Access** - $20 USD\n\n"
+        "You can enjoy **9,000 videos** from our extensive collection, instantly available upon payment.\n\n"
+        "Click below to proceed with your payment via Telegram's secure payment system:\n"
+        "[Proceed with Payment](https://t.me/Cryptopayphbot?startapp=pay)"
+    )
+    await context.bot.send_message(chat_id=user.id, text=payment_instructions, parse_mode='Markdown')
 
 # Handle new member joining the group or channel
 async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
