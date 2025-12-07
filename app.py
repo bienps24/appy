@@ -41,7 +41,7 @@ async def send_videos(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=user_id,
         text="Reminder: Don't forget to share for free access or make a payment for global access. Click below to choose your option.",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/J7QmfrqcY-U5MTBl")]
+            [InlineKeyboardButton("Share 0/2 for Free Access", url="https://telegram.me/share/url?url=https://t.me/+J7QmfrqcY-U5MTBl")]
         ])
     )
 
