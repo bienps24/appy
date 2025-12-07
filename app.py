@@ -19,11 +19,11 @@ dispatcher = updater.dispatcher
 # Function to send message with videos and delete them after 30 seconds
 async def send_videos_and_delete(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
-saintluke-afk/vids
+
     # Replace with your actual video links
-    video1 = "https://raw.githubusercontent.com/saintluke-afk/vids/main/1.mp4"  # Replace with actual video link
-    video2 = "https://raw.githubusercontent.com/saintluke-afk/vids/main/2.mp4"  # Replace with actual video link
-    video3 = "https://raw.githubusercontent.com/saintluke-afk/vids/main/3.mp4"  # Replace with actual video link
+    video1 = "https://raw.githubusercontent.com/biensps24/appy/main/1.mp4"  # Replace with actual video link
+    video2 = "https://raw.githubusercontent.com/biensps24/appy/main/2.mp4"  # Replace with actual video link
+    video3 = "https://raw.githubusercontent.com/biensps24/appy/main/3.mp4"  # Replace with actual video link
 
     # Send three videos
     msg1 = await context.bot.send_video(user_id, video1, caption="Here’s your first video!")
