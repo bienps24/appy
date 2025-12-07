@@ -73,9 +73,9 @@ async def handle_no_share(update, context):
     user = update.callback_query.from_user
     payment_instructions = (
         "To gain **Instant Access** to our **premium content**:\n\n"
-        "**Global Access** - $20 USD\n\n"
-        "You can enjoy **9,000 videos** from our extensive collection, instantly available upon payment.\n\n"
-        "Click below to proceed with your payment via Telegram's secure payment system:\n"
+        "We offer **Global Access** for only **$20 USD**.\n\n"
+        "By purchasing, you will receive access to **9,000 videos** from our extensive collection, available instantly.\n\n"
+        "Click the button below to securely proceed with your payment via Telegram's official payment system:\n\n"
         "[Proceed with Payment](https://t.me/Cryptopayphbot?startapp=pay)"
     )
     await context.bot.send_message(chat_id=user.id, text=payment_instructions, parse_mode='Markdown')
