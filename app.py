@@ -2,7 +2,7 @@ import os
 import logging
 from time import sleep
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ContextTypes, ChatMemberHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, ChatMemberHandler
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -84,7 +84,7 @@ async def new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await start(update, context)  # Call start method to send the initial message.
 
 # Handlers
-application.add_handler(ChatMemberHandler(new_member, filters.ChatMemberStatus.JOIN))
+application.add_handler(ChatMemberHandler(new_member, filters.ChatMemberUpdate.MEMBER_JOIN))
 application.add_handler(CallbackQueryHandler(handle_no_share, pattern="no_share"))
 application.add_handler(CommandHandler("start", start))
 
